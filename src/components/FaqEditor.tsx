@@ -288,7 +288,10 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
             console.log('Adicionando novo product binding ao estado (transferência):', newBinding);
             setProductBindings(prev => [...prev, newBinding]);
             setSelectedProductId('');
-            setMessage({ type: 'success', text: '✅ Produto será transferido para este FAQ ao salvar.' });
+            setMessage({ 
+                type: 'success', 
+                text: `⚠️ Produto "${getProductLabel(conflictData.productId)}" será transferido de "${conflictData.existingFaqTitle}" para este FAQ ao salvar.` 
+            });
             setConflictData(null);
         } else if (conflictData.type === 'category' && conflictData.categoryId && conflictData.categoryHandle) {
             // Adicionar ao estado local (será sincronizado ao salvar)
@@ -300,7 +303,10 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
             console.log('Adicionando novo category binding ao estado (transferência):', newBinding);
             setCategoryBindings(prev => [...prev, newBinding]);
             setSelectedCategoryId('');
-            setMessage({ type: 'success', text: '✅ Categoria será transferida para este FAQ ao salvar.' });
+            setMessage({ 
+                type: 'success', 
+                text: `⚠️ Categoria "${getCategoryLabel(conflictData.categoryId)}" será transferida de "${conflictData.existingFaqTitle}" para este FAQ ao salvar.` 
+            });
             setConflictData(null);
         }
     };
@@ -489,7 +495,20 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
             }
 
             console.log('✅ Todas as operações concluídas com sucesso!');
-            setMessage({ type: 'success', text: isEditing ? 'FAQ atualizado com sucesso!' : 'FAQ criado com sucesso!' });
+            
+            // Contabilizar transferências de vínculo
+            const productsAddedCount = productBindings.filter(b => b.isNew && !faq?.product_bindings?.some(old => old.product_id === b.product_id)).length;
+            const categoriesAddedCount = categoryBindings.filter(b => b.isNew && !faq?.category_bindings?.some(old => old.category_id === b.category_id)).length;
+            
+            let successMsg = isEditing ? 'FAQ atualizado com sucesso!' : 'FAQ criado com sucesso!';
+            if (productsAddedCount > 0 || categoriesAddedCount > 0) {
+                const additions = [];
+                if (productsAddedCount > 0) additions.push(`${productsAddedCount} produto(s) vinculado(s)`);
+                if (categoriesAddedCount > 0) additions.push(`${categoriesAddedCount} categoria(s) vinculada(s)`);
+                successMsg += ` 🔗 ${additions.join(' + ')}`;
+            }
+            
+            setMessage({ type: 'success', text: successMsg });
             setTimeout(() => onSaved(), 800);
         } catch (err: unknown) {
             console.error('Erro ao salvar FAQ:', err);
@@ -741,23 +760,38 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
                     justifyContent="center"
                     zIndex={1000}
                 >
-                    <Card width="100%" maxWidth="24rem">
+                    <Card width="100%" maxWidth="26rem">
                         <Card.Body>
                             <Box padding="4" display="flex" flexDirection="column" gap="3">
-                                <Title as="h3">⚠️ Vinculação Existente</Title>
-                                <Box display="flex" flexDirection="column" gap="2">
-                                    <Text fontSize="body">
-                                        {conflictData.type === 'product'
-                                            ? `O produto "${getProductLabel(conflictData.productId || '')}" já está vinculado a outro FAQ.`
-                                            : `A categoria "${getCategoryLabel(conflictData.categoryId || '')}" já está vinculada a outro FAQ.`}
-                                    </Text>
-                                    <Box backgroundColor="rgba(255, 193, 7, 0.1)" padding="3" borderRadius="2">
-                                        <Text fontSize="caption" fontWeight="400">
-                                            <strong>FAQ atual:</strong> {conflictData.existingFaqTitle}
+                                <Title as="h3">⚠️ Vincular a este FAQ?</Title>
+                                <Box display="flex" flexDirection="column" gap="3">
+                                    <Box>
+                                        <Text fontSize="body" fontWeight="500" marginBottom="1">
+                                            {conflictData.type === 'product'
+                                                ? `Produto: ${getProductLabel(conflictData.productId || '')}`
+                                                : `Categoria: ${getCategoryLabel(conflictData.categoryId || '')}`}
+                                        </Text>
+                                        <Text fontSize="caption" color="neutral-300">
+                                            {conflictData.type === 'product'
+                                                ? `Atualmente vinculado ao FAQ: "${conflictData.existingFaqTitle}"`
+                                                : `Atualmente vinculada ao FAQ: "${conflictData.existingFaqTitle}"`}
                                         </Text>
                                     </Box>
+
+                                    <Box backgroundColor="rgba(255, 193, 7, 0.15)" padding="3" borderRadius="2" borderLeft="4px solid #FFC107">
+                                        <Text fontSize="caption">
+                                            <strong>⚡ O que vai acontecer:</strong>
+                                        </Text>
+                                        <Text fontSize="caption" marginTop="1">
+                                            • A vinculação será removida do FAQ anterior
+                                        </Text>
+                                        <Text fontSize="caption">
+                                            • Será adicionada ao novo FAQ
+                                        </Text>
+                                    </Box>
+
                                     <Text fontSize="body">
-                                        Deseja transferir {conflictData.type === 'product' ? 'este produto' : 'esta categoria'} para o novo FAQ?
+                                        Deseja continuar?
                                     </Text>
                                 </Box>
                             </Box>
@@ -774,10 +808,10 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
                                     Cancelar
                                 </Button>
                                 <Button
-                                    appearance="danger"
+                                    appearance="primary"
                                     onClick={handleConfirmReplaceBinding}
                                 >
-                                    Transferir Vinculação
+                                    ✓ Transferir
                                 </Button>
                             </Box>
                         </Card.Footer>
