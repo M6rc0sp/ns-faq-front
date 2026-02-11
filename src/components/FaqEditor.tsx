@@ -184,7 +184,7 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
             const checkResult = await faqAPI.checkProductFaq(storeId, selectedProductId);
 
             // Se já está vinculado a outro FAQ, solicita confirmação
-            if (checkResult.exists && checkResult.data && checkResult.data.id !== faq?.id) {
+            if (checkResult.data?.exists && checkResult.data && checkResult.data.id !== faq?.id) {
                 console.log('Produto já vinculado a outro FAQ:', checkResult.data);
                 setConflictData({
                     type: 'product',
@@ -238,10 +238,15 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
                 return;
             }
 
+            if (!categoryHandle) {
+                console.error('Não foi possível normalizar categoria handle');
+                return;
+            }
+
             const checkResult = await faqAPI.checkCategoryFaq(storeId, categoryHandle);
 
             // Se já está vinculada a outro FAQ, solicita confirmação
-            if (checkResult.exists && checkResult.data && checkResult.data.id !== faq?.id) {
+            if (checkResult.data?.exists && checkResult.data && checkResult.data.id !== faq?.id) {
                 console.log('Categoria já vinculada a outro FAQ:', checkResult.data);
                 setConflictData({
                     type: 'category',
@@ -288,9 +293,9 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
             console.log('Adicionando novo product binding ao estado (transferência):', newBinding);
             setProductBindings(prev => [...prev, newBinding]);
             setSelectedProductId('');
-            setMessage({ 
-                type: 'success', 
-                text: `⚠️ Produto "${getProductLabel(conflictData.productId)}" será transferido de "${conflictData.existingFaqTitle}" para este FAQ ao salvar.` 
+            setMessage({
+                type: 'success',
+                text: `⚠️ Produto "${getProductLabel(conflictData.productId)}" será transferido de "${conflictData.existingFaqTitle}" para este FAQ ao salvar.`
             });
             setConflictData(null);
         } else if (conflictData.type === 'category' && conflictData.categoryId && conflictData.categoryHandle) {
@@ -303,9 +308,9 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
             console.log('Adicionando novo category binding ao estado (transferência):', newBinding);
             setCategoryBindings(prev => [...prev, newBinding]);
             setSelectedCategoryId('');
-            setMessage({ 
-                type: 'success', 
-                text: `⚠️ Categoria "${getCategoryLabel(conflictData.categoryId)}" será transferida de "${conflictData.existingFaqTitle}" para este FAQ ao salvar.` 
+            setMessage({
+                type: 'success',
+                text: `⚠️ Categoria "${getCategoryLabel(conflictData.categoryId)}" será transferida de "${conflictData.existingFaqTitle}" para este FAQ ao salvar.`
             });
             setConflictData(null);
         }
@@ -495,11 +500,11 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
             }
 
             console.log('✅ Todas as operações concluídas com sucesso!');
-            
+
             // Contabilizar transferências de vínculo
             const productsAddedCount = productBindings.filter(b => b.isNew && !faq?.product_bindings?.some(old => old.product_id === b.product_id)).length;
             const categoriesAddedCount = categoryBindings.filter(b => b.isNew && !faq?.category_bindings?.some(old => old.category_id === b.category_id)).length;
-            
+
             let successMsg = isEditing ? 'FAQ atualizado com sucesso!' : 'FAQ criado com sucesso!';
             if (productsAddedCount > 0 || categoriesAddedCount > 0) {
                 const additions = [];
@@ -507,7 +512,7 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
                 if (categoriesAddedCount > 0) additions.push(`${categoriesAddedCount} categoria(s) vinculada(s)`);
                 successMsg += ` 🔗 ${additions.join(' + ')}`;
             }
-            
+
             setMessage({ type: 'success', text: successMsg });
             setTimeout(() => onSaved(), 800);
         } catch (err: unknown) {
@@ -754,43 +759,42 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
                     left="0"
                     right="0"
                     bottom="0"
-                    backgroundColor="rgba(0, 0, 0, 0.5)"
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
-                    zIndex={1000}
+                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 1000 }}
                 >
-                    <Card width="100%" maxWidth="26rem">
+                    <Card style={{ width: '100%', maxWidth: '26rem' }}>
                         <Card.Body>
                             <Box padding="4" display="flex" flexDirection="column" gap="3">
                                 <Title as="h3">⚠️ Vincular a este FAQ?</Title>
                                 <Box display="flex" flexDirection="column" gap="3">
                                     <Box>
-                                        <Text fontSize="body" fontWeight="500" marginBottom="1">
+                                        <Text as="p" fontSize="base" style={{ fontWeight: 'medium', marginBottom: '0.5rem' }}>
                                             {conflictData.type === 'product'
                                                 ? `Produto: ${getProductLabel(conflictData.productId || '')}`
                                                 : `Categoria: ${getCategoryLabel(conflictData.categoryId || '')}`}
                                         </Text>
-                                        <Text fontSize="caption" color="neutral-300">
+                                        <Text as="p" fontSize="caption" color="neutral-300">
                                             {conflictData.type === 'product'
                                                 ? `Atualmente vinculado ao FAQ: "${conflictData.existingFaqTitle}"`
                                                 : `Atualmente vinculada ao FAQ: "${conflictData.existingFaqTitle}"`}
                                         </Text>
                                     </Box>
 
-                                    <Box backgroundColor="rgba(255, 193, 7, 0.15)" padding="3" borderRadius="2" borderLeft="4px solid #FFC107">
-                                        <Text fontSize="caption">
+                                    <Box padding="3" borderRadius="2" style={{ backgroundColor: 'rgba(255, 193, 7, 0.15)', borderLeft: '4px solid #FFC107' }}>
+                                        <Text as="p" fontSize="caption">
                                             <strong>⚡ O que vai acontecer:</strong>
                                         </Text>
-                                        <Text fontSize="caption" marginTop="1">
+                                        <Text as="p" fontSize="caption" style={{ marginTop: '0.5rem' }}>
                                             • A vinculação será removida do FAQ anterior
                                         </Text>
-                                        <Text fontSize="caption">
+                                        <Text as="p" fontSize="caption">
                                             • Será adicionada ao novo FAQ
                                         </Text>
                                     </Box>
 
-                                    <Text fontSize="body">
+                                    <Text as="p" fontSize="base">
                                         Deseja continuar?
                                     </Text>
                                 </Box>
