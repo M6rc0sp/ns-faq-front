@@ -51,8 +51,8 @@ export const faqAPI = {
     checkProductFaq: (storeId: string, productId: string) =>
         axios.get(`/public/check/product/${storeId}/${productId}`, { baseURL: '' }),
 
-    checkCategoryFaq: (storeId: string, categoryHandle: string) =>
-        axios.get(`/public/check/category/${storeId}/${categoryHandle}`, { baseURL: '' }),
+    checkCategoryFaq: (storeId: string, categoryId: string) =>
+        axios.get(`/public/check/category/${storeId}/${categoryId}`, { baseURL: '' }),
 
     checkHomepageFaq: (storeId: string) =>
         axios.get(`/public/check/homepage/${storeId}`, { baseURL: '' }),

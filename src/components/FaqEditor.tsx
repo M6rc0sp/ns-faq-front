@@ -238,12 +238,7 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
                 return;
             }
 
-            if (!categoryHandle) {
-                console.error('Não foi possível normalizar categoria handle');
-                return;
-            }
-
-            const checkResult = await faqAPI.checkCategoryFaq(storeId, categoryHandle);
+            const checkResult = await faqAPI.checkCategoryFaq(storeId, selectedCategoryId);
 
             // Se já está vinculada a outro FAQ, solicita confirmação
             if (checkResult.data?.exists && checkResult.data && checkResult.data.id !== faq?.id) {
