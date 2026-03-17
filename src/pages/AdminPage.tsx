@@ -124,7 +124,7 @@ const AdminPage: React.FC = () => {
                                     <Card>
                                         <Card.Body>
                                             <Box display="flex" flexDirection="column" alignItems="center" gap="4" textAlign="center" padding="6">
-                                                <Title as="h3">Nenhum FAQ cadastrado</Title>
+                                                <Title as="h2">Nenhum FAQ cadastrado</Title>
                                                 <Text color="neutral-textDisabled">
                                                     Crie seu primeiro FAQ com perguntas, respostas e vincule a produtos, categorias ou homepage.
                                                 </Text>
@@ -158,7 +158,8 @@ const AdminPage: React.FC = () => {
                                                             >
                                                                 {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
                                                                 <Box>
-                                                                    <Title as="h4">{faq.title}</Title>
+                                                                    
+                                    <Title as="h2">{faq.title}</Title>
                                                                     <Box display="flex" gap="2" marginTop="1" flexWrap="wrap">
                                                                         <Tag appearance="neutral">
                                                                             {faq.questions?.length || 0} pergunta(s)

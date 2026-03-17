@@ -522,7 +522,7 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
     return (
         <Card padding="base">
             <Card.Header>
-                <Title as="h3">{isEditing ? 'Editar FAQ' : 'Novo FAQ'}</Title>
+                <Title as="h2">{isEditing ? 'Editar FAQ' : 'Novo FAQ'}</Title>
             </Card.Header>
             <Card.Body>
                 <Box display="flex" flexDirection="column" gap="4">
@@ -547,7 +547,7 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
                     <Card>
                         <Card.Header>
                             <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
-                                <Title as="h4">Perguntas e Respostas ({questions.length})</Title>
+                                <Title as="h3">Perguntas e Respostas ({questions.length})</Title>
                                 <Button appearance="neutral" onClick={() => setShowQuestions(!showQuestions)}>
                                     {showQuestions ? <ChevronUpIcon /> : <ChevronDownIcon />}
                                 </Button>
@@ -603,7 +603,7 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
                     <Card>
                         <Card.Header>
                             <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
-                                <Title as="h4">Onde exibir este FAQ</Title>
+                                <Title as="h3">Onde exibir este FAQ</Title>
                                 <Button appearance="neutral" onClick={() => setShowBindings(!showBindings)}>
                                     {showBindings ? <ChevronUpIcon /> : <ChevronDownIcon />}
                                 </Button>
@@ -762,7 +762,7 @@ const FaqEditor: React.FC<FaqEditorProps> = ({ faq, onSaved, onCancel }) => {
                     <Card style={{ width: '100%', maxWidth: '26rem' }}>
                         <Card.Body>
                             <Box padding="4" display="flex" flexDirection="column" gap="3">
-                                <Title as="h3">⚠️ Vincular a este FAQ?</Title>
+                                <Title as="h2">⚠️ Vincular a este FAQ?</Title>
                                 <Box display="flex" flexDirection="column" gap="3">
                                     <Box>
                                         <Text as="p" fontSize="base" style={{ fontWeight: 'medium', marginBottom: '0.5rem' }}>
