@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Layout, Page } from '@nimbus-ds/patterns';
 import { navigateHeaderRemove } from '@tiendanube/nexo';
 import { Card, Text, Box, Title, Spinner, Alert, Button, Tag, IconButton } from '@nimbus-ds/components';
-import { PlusCircleIcon, EditIcon, TrashIcon, ChevronDownIcon, ChevronUpIcon, SettingsIcon } from '@nimbus-ds/icons';
+import { PlusCircleIcon, EditIcon, TrashIcon, ChevronDownIcon, ChevronUpIcon, SlidersIcon } from '@nimbus-ds/icons';
 
 import { nexo } from '@/app';
 import { faqAPI } from '@/app/api';
@@ -20,7 +20,8 @@ const AdminPage: React.FC = () => {
     const [editorMode, setEditorMode] = useState<EditorMode>({ type: 'closed' });
     const [expandedFaqId, setExpandedFaqId] = useState<number | null>(null);
     const [isSelectorModalOpen, setIsSelectorModalOpen] = useState(false);
-    const storeId = nexo.store?.id || '';
+    // Store ID será preenchido pelo middleware na API (request.attributes.store_id)
+    const storeId = '';
 
     useEffect(() => { navigateHeaderRemove(nexo); }, []);
 
@@ -111,11 +112,11 @@ const AdminPage: React.FC = () => {
                                 {/* Botões de criar FAQ e configurar seletores */}
                                 <Box display="flex" justifyContent="flex-end" gap="2" marginBottom="4" alignItems="center">
                                     <Button
-                                        appearance="secondary"
+                                        appearance="neutral"
                                         onClick={() => setIsSelectorModalOpen(true)}
                                         title="Configura os seletores CSS para cada template"
                                     >
-                                        <SettingsIcon />
+                                        <SlidersIcon />
                                         Configurar Seletores
                                     </Button>
                                     <Button appearance="primary" onClick={() => setEditorMode({ type: 'create' })}>
