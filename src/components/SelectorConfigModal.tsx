@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
     Box,
     Button,
@@ -27,9 +26,9 @@ interface SelectorConfigModalProps {
 }
 
 const TEMPLATES = [
-    { id: 'homepage', label: 'Homepage', description: 'Página inicial da loja' },
-    { id: 'category', label: 'Categoria', description: 'Páginas de categorias' },
-    { id: 'product', label: 'Produto', description: 'Páginas de produtos' },
+    { id: 'homepage', label: 'Homepage' },
+    { id: 'category', label: 'Categoria' },
+    { id: 'product', label: 'Produto' },
 ];
 
 const POSITION_OPTIONS = [
@@ -47,7 +46,6 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
 
-    // Carregar configurações
     useEffect(() => {
         if (isOpen && storeId) {
             loadConfigs();
@@ -64,7 +62,6 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
                     const response = await faqAPI.getSelectorConfig(storeId, template.id);
                     results[template.id] = response.data || { selector: '', position: 'last-child' };
                 } catch (err) {
-                    // Use defaults if not found
                     results[template.id] = { selector: '', position: 'last-child' };
                 }
             }
@@ -84,7 +81,7 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
         try {
             const config = configs[activeTab];
             await faqAPI.updateSelectorConfig(storeId, activeTab, config);
-            setSuccess(`Configuração de ${activeTab} salva com sucesso!`);
+            setSuccess('Configuração salva com sucesso!');
             setTimeout(() => setSuccess(null), 3000);
         } catch (err) {
             const message = (err as Error)?.message || 'Erro ao salvar configuração';
@@ -107,21 +104,22 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
     if (!isOpen) return null;
 
     const currentConfig = configs[activeTab] || { selector: '', position: 'last-child' };
-    const currentTemplate = TEMPLATES.find(t => t.id === activeTab);
 
     return (
         <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
             position="fixed"
             top="0"
             left="0"
             width="100%"
             height="100%"
-            backgroundColor="rgba(0, 0, 0, 0.5)"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            zIndex="9999"
+            zIndex="500"
             onClick={onClose}
+            style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            }}
         >
             <Card
                 onClick={(e) => e.stopPropagation()}
@@ -130,139 +128,121 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
                     maxWidth: '600px',
                     maxHeight: '90vh',
                     overflow: 'auto',
-                    borderRadius: '12px',
                 }}
             >
-                <Card.Header>
-                    <Box display="flex" justifyContent="space-between" alignItems="center" padding="4">
-                        <Title as="h2">⚙️ Configurar Seletores CSS</Title>
-                        <Button
-                            appearance="minimal"
-                            onClick={onClose}
-                            style={{ padding: '0', minWidth: 'auto' }}
-                        >
-                            <CloseIcon size="large" />
-                        </Button>
-                    </Box>
-                </Card.Header>
+                {/* Header */}
+                <Box display="flex" justifyContent="space-between" alignItems="center" padding="4">
+                    <Title>⚙️ Configurar Seletores</Title>
+                    <Button
+                        appearance="transparent"
+                        onClick={onClose}
+                        style={{ padding: '0', minWidth: 'auto' }}
+                    >
+                        <CloseIcon />
+                    </Button>
+                </Box>
 
-                <Card.Body>
-                    <Box padding="4" display="flex" flexDirection="column" gap="4">
-                        {/* Tabs */}
-                        <Box display="flex" gap="2" borderBottom="1px solid" borderColor="neutral-interactive">
-                            {TEMPLATES.map(template => (
-                                <Button
-                                    key={template.id}
-                                    appearance={activeTab === template.id ? 'primary' : 'secondary'}
-                                    onClick={() => setActiveTab(template.id)}
-                                    style={{
-                                        borderBottom: activeTab === template.id ? '3px solid' : 'none',
-                                        borderRadius: '0',
-                                        paddingBottom: '12px',
-                                    }}
-                                >
-                                    {template.label}
-                                </Button>
-                            ))}
+                {/* Separator */}
+                <Box 
+                    style={{
+                        height: '1px',
+                        backgroundColor: '#e0e0e0',
+                        margin: '0 16px',
+                    }}
+                />
+
+                {/* Content */}
+                <Box padding="4" display="flex" flexDirection="column" gap="4">
+                    {/* Tabs */}
+                    <Box display="flex" gap="2">
+                        {TEMPLATES.map(template => (
+                            <Button
+                                key={template.id}
+                                appearance={activeTab === template.id ? 'primary' : 'neutral'}
+                                onClick={() => setActiveTab(template.id)}
+                            >
+                                {template.label}
+                            </Button>
+                        ))}
+                    </Box>
+
+                    {/* Loading */}
+                    {isLoading && (
+                        <Box display="flex" justifyContent="center" padding="6">
+                            <Spinner />
                         </Box>
+                    )}
 
-                        {/* Loading */}
-                        {isLoading && (
-                            <Box display="flex" justifyContent="center" padding="6">
-                                <Spinner />
+                    {!isLoading && (
+                        <>
+                            {/* Error */}
+                            {error && <Alert appearance="danger" title="Erro">{error}</Alert>}
+
+                            {/* Success */}
+                            {success && <Alert appearance="success" title="Sucesso">{success}</Alert>}
+
+                            {/* CSS Selector Field */}
+                            <Box display="flex" flexDirection="column" gap="2">
+                                <Label htmlFor="selector-input">Seletor CSS</Label>
+                                <Textarea
+                                    id="selector-input"
+                                    name="selector"
+                                    placeholder="Ex: .meu-container, #faq-section"
+                                    value={currentConfig.selector}
+                                    onChange={(e) => updateConfig('selector', e.target.value)}
+                                    rows={3}
+                                />
+                                <Text>
+                                    💡 Use F12 para encontrar o seletor correto
+                                </Text>
                             </Box>
-                        )}
 
-                        {!isLoading && (
-                            <>
-                                {/* Template Info */}
-                                {currentTemplate && (
-                                    <Box
-                                        padding="3"
-                                        backgroundColor="neutral-background"
-                                        borderRadius="2"
-                                        borderLeft="4px solid"
-                                        borderColor="neutral-interactive"
-                                    >
-                                        <Label htmlFor="template-info" as="div">{currentTemplate.label}</Label>
-                                        <Text as="p" color="neutral-textLow" fontSize="smaller">
-                                            {currentTemplate.description}
-                                        </Text>
-                                    </Box>
-                                )}
+                            {/* Position Select */}
+                            <Box display="flex" flexDirection="column" gap="2">
+                                <Label htmlFor="position-select">Posição</Label>
+                                <Select
+                                    id="position-select"
+                                    name="position"
+                                    value={currentConfig.position}
+                                    onChange={(e) => updateConfig('position', e.target.value as any)}
+                                >
+                                    {POSITION_OPTIONS.map(opt => (
+                                        <option key={opt.value} value={opt.value}>
+                                            {opt.label}
+                                        </option>
+                                    ))}
+                                </Select>
+                            </Box>
 
-                                {/* Error */}
-                                {error && <Alert appearance="danger" title="Erro">{error}</Alert>}
+                            {/* Position Help */}
+                            <Box display="flex" flexDirection="column" gap="2">
+                                <Text fontWeight="bold">Opções disponíveis:</Text>
+                                <Text>• Antes: insere antes do elemento</Text>
+                                <Text>• Depois: insere depois do elemento</Text>
+                                <Text>• Primeiro filho: primeiro da caixa</Text>
+                                <Text>• Último filho: último da caixa (padrão)</Text>
+                            </Box>
 
-                                {/* Success */}
-                                {success && <Alert appearance="success" title="Sucesso">{success}</Alert>}
-
-                                {/* CSS Selector Field */}
-                                <Box display="flex" flexDirection="column" gap="2">
-                                    <Label htmlFor="selector-input">Seletor CSS</Label>
-                                    <Textarea
-                                        id="selector-input"
-                                        placeholder="Ex: .meu-container, #faq-section, [data-store='home']"
-                                        value={currentConfig.selector}
-                                        onChange={(e) => updateConfig('selector', e.target.value)}
-                                        rows={3}
-                                    />
-                                    <Text as="p" fontSize="smaller" color="neutral-textLow">
-                                        💡 Dica: Use o inspetor de elementos do navegador (F12) para encontrar o seletor correto.
-                                    </Text>
-                                </Box>
-
-                                {/* Position Select */}
-                                <Box display="flex" flexDirection="column" gap="2">
-                                    <Label htmlFor="position-select">Posição do FAQ</Label>
-                                    <Select
-                                        id="position-select"
-                                        value={currentConfig.position}
-                                        onChange={(e) => updateConfig('position', e.target.value as any)}
-                                    >
-                                        {POSITION_OPTIONS.map(opt => (
-                                            <option key={opt.value} value={opt.value}>
-                                                {opt.label}
-                                            </option>
-                                        ))}
-                                    </Select>
-                                    <Box display="flex" flexDirection="column" gap="1" fontSize="smaller" color="neutral-textLow">
-                                        <Text>
-                                            • <strong>Antes</strong>: FAQ aparece antes do elemento selecionado
-                                        </Text>
-                                        <Text>
-                                            • <strong>Depois</strong>: FAQ aparece depois do elemento selecionado
-                                        </Text>
-                                        <Text>
-                                            • <strong>Primeiro filho</strong>: FAQ é o primeiro elemento dentro do container
-                                        </Text>
-                                        <Text>
-                                            • <strong>Último filho</strong>: FAQ é o último elemento dentro do container (padrão)
-                                        </Text>
-                                    </Box>
-                                </Box>
-
-                                {/* Action Buttons */}
-                                <Box display="flex" gap="2" marginTop="4">
-                                    <Button
-                                        appearance="secondary"
-                                        onClick={onClose}
-                                        disabled={isSaving}
-                                    >
-                                        Cancelar
-                                    </Button>
-                                    <Button
-                                        appearance="primary"
-                                        onClick={handleSave}
-                                        disabled={isSaving || !currentConfig.selector}
-                                    >
-                                        {isSaving ? <Spinner /> : '💾 Salvar Configuração'}
-                                    </Button>
-                                </Box>
-                            </>
-                        )}
-                    </Box>
-                </Card.Body>
+                            {/* Action Buttons */}
+                            <Box display="flex" gap="2" marginTop="4">
+                                <Button
+                                    appearance="neutral"
+                                    onClick={onClose}
+                                    disabled={isSaving}
+                                >
+                                    Cancelar
+                                </Button>
+                                <Button
+                                    appearance="primary"
+                                    onClick={handleSave}
+                                    disabled={isSaving || !currentConfig.selector}
+                                >
+                                    {isSaving ? <Spinner /> : '💾 Salvar'}
+                                </Button>
+                            </Box>
+                        </>
+                    )}
+                </Box>
             </Card>
         </Box>
     );
