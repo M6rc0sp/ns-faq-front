@@ -47,6 +47,13 @@ export const faqAPI = {
     removeCategory: (faqId: string | number, categoryId: string) =>
         axios.delete(`/faqs/${faqId}/categories/${categoryId}`),
 
+    // Selector configuration
+    getSelectorConfig: (storeId: string, template: string) =>
+        axios.get(`/public/faqs/config/${storeId}/${template}`, { baseURL: '' }),
+
+    updateSelectorConfig: (storeId: string, template: string, config: { selector: string; position: string }) =>
+        axios.put(`/public/faqs/config/${storeId}/${template}`, config),
+
     // Check existing bindings (public endpoints)
     checkProductFaq: (storeId: string, productId: string) =>
         axios.get(`/public/check/product/${storeId}/${productId}`, { baseURL: '' }),

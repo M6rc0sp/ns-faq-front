@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Layout, Page } from '@nimbus-ds/patterns';
 import { navigateHeaderRemove } from '@tiendanube/nexo';
 import { Card, Text, Box, Title, Spinner, Alert, Button, Tag, IconButton } from '@nimbus-ds/components';
-import { PlusCircleIcon, EditIcon, TrashIcon, ChevronDownIcon, ChevronUpIcon } from '@nimbus-ds/icons';
+import { PlusCircleIcon, EditIcon, TrashIcon, ChevronDownIcon, ChevronUpIcon, SettingsIcon } from '@nimbus-ds/icons';
 
 import { nexo } from '@/app';
 import { faqAPI } from '@/app/api';
-import { FaqEditor } from '@/components';
+import { FaqEditor, SelectorConfigModal } from '@/components';
 import type { Faq } from '@/types/faq';
 
 type EditorMode = { type: 'closed' } | { type: 'create' } | { type: 'edit'; faq: Faq };
@@ -19,6 +19,8 @@ const AdminPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [editorMode, setEditorMode] = useState<EditorMode>({ type: 'closed' });
     const [expandedFaqId, setExpandedFaqId] = useState<number | null>(null);
+    const [isSelectorModalOpen, setIsSelectorModalOpen] = useState(false);
+    const storeId = nexo.store?.id || '';
 
     useEffect(() => { navigateHeaderRemove(nexo); }, []);
 
@@ -106,8 +108,16 @@ const AdminPage: React.FC = () => {
                             </Box>
                         ) : (
                             <>
-                                {/* Botão de criar FAQ */}
-                                <Box display="flex" justifyContent="flex-end" marginBottom="4">
+                                {/* Botões de criar FAQ e configurar seletores */}
+                                <Box display="flex" justifyContent="flex-end" gap="2" marginBottom="4" alignItems="center">
+                                    <Button 
+                                        appearance="secondary" 
+                                        onClick={() => setIsSelectorModalOpen(true)}
+                                        title="Configura os seletores CSS para cada template"
+                                    >
+                                        <SettingsIcon />
+                                        Configurar Seletores
+                                    </Button>
                                     <Button appearance="primary" onClick={() => setEditorMode({ type: 'create' })}>
                                         <PlusCircleIcon />
                                         Novo FAQ
@@ -205,6 +215,13 @@ const AdminPage: React.FC = () => {
                                 )}
                             </>
                         )}
+
+                        {/* Modal de Configuração de Seletores */}
+                        <SelectorConfigModal 
+                            isOpen={isSelectorModalOpen}
+                            onClose={() => setIsSelectorModalOpen(false)}
+                            storeId={storeId}
+                        />
                     </Layout.Section>
                 </Layout>
             </Page.Body>
