@@ -1,0 +1,52 @@
+.modalCard {
+  width: 90%;
+  min-width: 320px;
+  max-width: 650px;
+  max-height: 85vh;
+  overflow: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+/* Tablet - até 768px */
+@media (max-width: 768px) {
+  .modalCard {
+    width: 95%;
+    max-width: 95%;
+    max-height: 90vh;
+  }
+}
+
+/* Mobile - até 480px */
+@media (max-width: 480px) {
+  .modalCard {
+    width: 98%;
+    max-width: 100%;
+    max-height: 95vh;
+    max-height: 95dvh; /* Dynamic viewport height para considerar mobile keyboard */
+  }
+}
+
+.modalOverlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh; /* Dynamic viewport height */
+  z-index: 500;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 16px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* Scroll behavior mobile-friendly */
+@media (max-width: 640px) {
+  .modalOverlay {
+    padding: 8px;
+  }
+}

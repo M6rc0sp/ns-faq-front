@@ -13,6 +13,7 @@ import {
 } from '@nimbus-ds/components';
 import { CloseIcon } from '@nimbus-ds/icons';
 import { faqAPI } from '@/app/api';
+import styles from './SelectorConfigModal.module.css';
 
 interface SelectorConfig {
     selector: string;
@@ -107,28 +108,12 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
 
     return (
         <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            position="fixed"
-            top="0"
-            left="0"
-            width="100%"
-            height="100%"
-            zIndex="500"
+            className={styles.modalOverlay}
             onClick={onClose}
-            style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            }}
         >
             <Card
                 onClick={(e) => e.stopPropagation()}
-                style={{
-                    width: '90%',
-                    maxWidth: '600px',
-                    maxHeight: '90vh',
-                    overflow: 'auto',
-                }}
+                className={styles.modalCard}
             >
                 {/* Header */}
                 <Box display="flex" justifyContent="space-between" alignItems="center" padding="4">
