@@ -5,11 +5,13 @@ import {
     Button,
     Text,
     Title,
-    TextField,
+    Input,
+    Textarea,
     Select,
     Card,
     Spinner,
     Alert,
+    Label,
 } from '@nimbus-ds/components';
 import { CrossIcon } from '@nimbus-ds/icons';
 import { faqAPI } from '@/app/api';
@@ -184,7 +186,7 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
                                         borderLeft="4px solid"
                                         borderColor="neutral-interactive"
                                     >
-                                        <Text fontWeight="bold">{currentTemplate.label}</Text>
+                                        <Label htmlFor="template-info" as="div">{currentTemplate.label}</Label>
                                         <Text as="p" color="neutral-textLow" fontSize="smaller">
                                             {currentTemplate.description}
                                         </Text>
@@ -199,13 +201,12 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
 
                                 {/* CSS Selector Field */}
                                 <Box display="flex" flexDirection="column" gap="2">
-                                    <Text fontWeight="bold">Seletor CSS</Text>
-                                    <TextField
+                                    <Label htmlFor="selector-input">Seletor CSS</Label>
+                                    <Textarea
+                                        id="selector-input"
                                         placeholder="Ex: .meu-container, #faq-section, [data-store='home']"
                                         value={currentConfig.selector}
                                         onChange={(e) => updateConfig('selector', e.target.value)}
-                                        helpMessage="Insira um seletor CSS válido para localizar o elemento onde o FAQ será inserido"
-                                        multiline
                                         rows={3}
                                     />
                                     <Text as="p" fontSize="smaller" color="neutral-textLow">
@@ -215,8 +216,9 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
 
                                 {/* Position Select */}
                                 <Box display="flex" flexDirection="column" gap="2">
-                                    <Text fontWeight="bold">Posição do FAQ</Text>
+                                    <Label htmlFor="position-select">Posição do FAQ</Label>
                                     <Select
+                                        id="position-select"
                                         value={currentConfig.position}
                                         onChange={(e) => updateConfig('position', e.target.value as any)}
                                     >
