@@ -110,8 +110,8 @@ const AdminPage: React.FC = () => {
                             <>
                                 {/* Botões de criar FAQ e configurar seletores */}
                                 <Box display="flex" justifyContent="flex-end" gap="2" marginBottom="4" alignItems="center">
-                                    <Button 
-                                        appearance="secondary" 
+                                    <Button
+                                        appearance="secondary"
                                         onClick={() => setIsSelectorModalOpen(true)}
                                         title="Configura os seletores CSS para cada template"
                                     >
@@ -168,8 +168,8 @@ const AdminPage: React.FC = () => {
                                                             >
                                                                 {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
                                                                 <Box>
-                                                                    
-                                    <Title as="h2">{faq.title}</Title>
+
+                                                                    <Title as="h2">{faq.title}</Title>
                                                                     <Box display="flex" gap="2" marginTop="1" flexWrap="wrap">
                                                                         <Tag appearance="neutral">
                                                                             {faq.questions?.length || 0} pergunta(s)
@@ -217,7 +217,7 @@ const AdminPage: React.FC = () => {
                         )}
 
                         {/* Modal de Configuração de Seletores */}
-                        <SelectorConfigModal 
+                        <SelectorConfigModal
                             isOpen={isSelectorModalOpen}
                             onClose={() => setIsSelectorModalOpen(false)}
                             storeId={storeId}

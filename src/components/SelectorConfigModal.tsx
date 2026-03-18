@@ -143,7 +143,7 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
                 </Box>
 
                 {/* Separator */}
-                <Box 
+                <Box
                     style={{
                         height: '1px',
                         backgroundColor: '#e0e0e0',
