@@ -3,17 +3,14 @@ import {
     Box,
     Button,
     Text,
-    Title,
     Textarea,
     Select,
-    Card,
     Spinner,
     Alert,
     Label,
+    Modal,
 } from '@nimbus-ds/components';
-import { CloseIcon } from '@nimbus-ds/icons';
 import { faqAPI } from '@/app/api';
-import styles from './SelectorConfigModal.module.css';
 
 interface SelectorConfig {
     selector: string;
@@ -38,6 +35,12 @@ const POSITION_OPTIONS = [
     { value: 'last-child', label: 'Último filho' },
 ];
 
+const DEFAULT_SELECTORS: Record<string, SelectorConfig> = {
+    homepage: { selector: '[data-store="home-newsletter"]', position: 'before' },
+    category: { selector: '.category-body', position: 'last-child' },
+    product: { selector: '.product-container', position: 'last-child' },
+};
+
 export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen, onClose }) => {
     const [activeTab, setActiveTab] = useState<string>('homepage');
     const [configs, setConfigs] = useState<Record<string, SelectorConfig>>({});
@@ -60,9 +63,9 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
             for (const template of TEMPLATES) {
                 try {
                     const response = await faqAPI.getSelectorConfig(template.id);
-                    results[template.id] = response.data.data || { selector: '', position: 'last-child' };
+                    results[template.id] = response.data.data || DEFAULT_SELECTORS[template.id];
                 } catch (err) {
-                    results[template.id] = { selector: '', position: 'last-child' };
+                    results[template.id] = DEFAULT_SELECTORS[template.id];
                 }
             }
             setConfigs(results);
@@ -91,6 +94,15 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
         }
     };
 
+    const handleReset = () => {
+        setConfigs(prev => ({
+            ...prev,
+            [activeTab]: DEFAULT_SELECTORS[activeTab],
+        }));
+        setSuccess('Restaurado para configuração padrão!');
+        setTimeout(() => setSuccess(null), 2000);
+    };
+
     const updateConfig = (field: keyof SelectorConfig, value: string) => {
         setConfigs(prev => ({
             ...prev,
@@ -101,133 +113,111 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
         }));
     };
 
-    if (!isOpen) return null;
-
-    const currentConfig = configs[activeTab] || { selector: '', position: 'last-child' };
+    const currentConfig = configs[activeTab] || DEFAULT_SELECTORS[activeTab];
 
     return (
-        <Box
-            className={styles.modalOverlay}
-            onClick={onClose}
-        >
-            <Card
-                onClick={(e) => e.stopPropagation()}
-                className={styles.modalCard}
-            >
-                {/* Header */}
-                <Box display="flex" justifyContent="space-between" alignItems="center" padding="4">
-                    <Title>⚙️ Configurar Seletores</Title>
-                    <Button
-                        appearance="transparent"
-                        onClick={onClose}
-                        style={{ padding: '0', minWidth: 'auto' }}
-                    >
-                        <CloseIcon />
-                    </Button>
-                </Box>
-
-                {/* Separator */}
-                <Box
-                    style={{
-                        height: '1px',
-                        backgroundColor: '#e0e0e0',
-                        margin: '0 16px',
-                    }}
-                />
-
-                {/* Content */}
-                <Box padding="4" display="flex" flexDirection="column" gap="4">
-                    {/* Tabs */}
-                    <Box display="flex" gap="2">
-                        {TEMPLATES.map(template => (
-                            <Button
-                                key={template.id}
-                                appearance={activeTab === template.id ? 'primary' : 'neutral'}
-                                onClick={() => setActiveTab(template.id)}
-                            >
-                                {template.label}
-                            </Button>
-                        ))}
+        <Modal open={isOpen} onDismiss={onClose}>
+            <Modal.Header title="⚙️ Configurar Seletores CSS" />
+            
+            <Modal.Body>
+                {isLoading && (
+                    <Box display="flex" justifyContent="center" padding="6">
+                        <Spinner />
                     </Box>
+                )}
 
-                    {/* Loading */}
-                    {isLoading && (
-                        <Box display="flex" justifyContent="center" padding="6">
-                            <Spinner />
+                {!isLoading && (
+                    <Box display="flex" flexDirection="column" gap="4">
+                        {/* Error */}
+                        {error && <Alert appearance="danger" title="Erro">{error}</Alert>}
+
+                        {/* Success */}
+                        {success && <Alert appearance="success" title="Sucesso">{success}</Alert>}
+
+                        {/* Tabs */}
+                        <Box display="flex" gap="2">
+                            {TEMPLATES.map(template => (
+                                <Button
+                                    key={template.id}
+                                    appearance={activeTab === template.id ? 'primary' : 'neutral'}
+                                    onClick={() => setActiveTab(template.id)}
+                                >
+                                    {template.label}
+                                </Button>
+                            ))}
                         </Box>
-                    )}
 
-                    {!isLoading && (
-                        <>
-                            {/* Error */}
-                            {error && <Alert appearance="danger" title="Erro">{error}</Alert>}
-
-                            {/* Success */}
-                            {success && <Alert appearance="success" title="Sucesso">{success}</Alert>}
-
-                            {/* CSS Selector Field */}
-                            <Box display="flex" flexDirection="column" gap="2">
+                        {/* CSS Selector Field */}
+                        <Box display="flex" flexDirection="column" gap="2">
+                            <Box display="flex" justifyContent="space-between" alignItems="center">
                                 <Label htmlFor="selector-input">Seletor CSS</Label>
-                                <Textarea
-                                    id="selector-input"
-                                    name="selector"
-                                    placeholder="Ex: .meu-container, #faq-section"
-                                    value={currentConfig.selector}
-                                    onChange={(e) => updateConfig('selector', e.target.value)}
-                                    rows={3}
-                                />
-                                <Text>
-                                    💡 Use F12 para encontrar o seletor correto
-                                </Text>
-                            </Box>
-
-                            {/* Position Select */}
-                            <Box display="flex" flexDirection="column" gap="2">
-                                <Label htmlFor="position-select">Posição</Label>
-                                <Select
-                                    id="position-select"
-                                    name="position"
-                                    value={currentConfig.position}
-                                    onChange={(e) => updateConfig('position', e.target.value as any)}
-                                >
-                                    {POSITION_OPTIONS.map(opt => (
-                                        <option key={opt.value} value={opt.value}>
-                                            {opt.label}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </Box>
-
-                            {/* Position Help */}
-                            <Box display="flex" flexDirection="column" gap="2">
-                                <Text fontWeight="bold">Opções disponíveis:</Text>
-                                <Text>• Antes: insere antes do elemento</Text>
-                                <Text>• Depois: insere depois do elemento</Text>
-                                <Text>• Primeiro filho: primeiro da caixa</Text>
-                                <Text>• Último filho: último da caixa (padrão)</Text>
-                            </Box>
-
-                            {/* Action Buttons */}
-                            <Box display="flex" gap="2" marginTop="4">
                                 <Button
-                                    appearance="neutral"
-                                    onClick={onClose}
-                                    disabled={isSaving}
+                                    appearance="transparent"
+                                    onClick={handleReset}
+                                    title="Restaurar padrão"
+                                    style={{ padding: '4px 8px', minWidth: 'auto' }}
                                 >
-                                    Cancelar
-                                </Button>
-                                <Button
-                                    appearance="primary"
-                                    onClick={handleSave}
-                                    disabled={isSaving || !currentConfig.selector}
-                                >
-                                    {isSaving ? <Spinner /> : '💾 Salvar'}
+                                    ↺
                                 </Button>
                             </Box>
-                        </>
-                    )}
-                </Box>
-            </Card>
-        </Box>
+                            <Textarea
+                                id="selector-input"
+                                name="selector"
+                                placeholder="Ex: .meu-container, #faq-section"
+                                value={currentConfig.selector}
+                                onChange={(e) => updateConfig('selector', e.target.value)}
+                                rows={3}
+                            />
+                            <Text>
+                                💡 Use F12 para encontrar o seletor correto. Ex: <code style={{ fontSize: '0.9em', backgroundColor: '#f0f0f0', padding: '2px 4px' }}>div.container</code> ou <code style={{ fontSize: '0.9em', backgroundColor: '#f0f0f0', padding: '2px 4px' }}>div&gt;p</code>
+                            </Text>
+                        </Box>
+
+                        {/* Position Select */}
+                        <Box display="flex" flexDirection="column" gap="2">
+                            <Label htmlFor="position-select">Posição</Label>
+                            <Select
+                                id="position-select"
+                                name="position"
+                                value={currentConfig.position}
+                                onChange={(e) => updateConfig('position', e.target.value as any)}
+                            >
+                                {POSITION_OPTIONS.map(opt => (
+                                    <option key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                    </option>
+                                ))}
+                            </Select>
+                        </Box>
+
+                        {/* Position Help */}
+                        <Box display="flex" flexDirection="column" gap="1">
+                            <Text style={{ fontSize: '0.875rem', fontWeight: 600 }}>Opções disponíveis:</Text>
+                            <Text style={{ fontSize: '0.875rem' }}>• <strong>Antes:</strong> insere antes do elemento</Text>
+                            <Text style={{ fontSize: '0.875rem' }}>• <strong>Depois:</strong> insere depois do elemento</Text>
+                            <Text style={{ fontSize: '0.875rem' }}>• <strong>Primeiro filho:</strong> primeiro item da caixa</Text>
+                            <Text style={{ fontSize: '0.875rem' }}>• <strong>Último filho:</strong> último item da caixa (padrão)</Text>
+                        </Box>
+                    </Box>
+                )}
+            </Modal.Body>
+
+            <Modal.Footer>
+                <Button
+                    appearance="neutral"
+                    onClick={onClose}
+                    disabled={isSaving}
+                >
+                    Cancelar
+                </Button>
+                <Button
+                    appearance="primary"
+                    onClick={handleSave}
+                    disabled={isSaving || !currentConfig.selector}
+                >
+                    {isSaving ? <Spinner /> : '💾 Salvar'}
+                </Button>
+            </Modal.Footer>
+        </Modal>
     );
 };
