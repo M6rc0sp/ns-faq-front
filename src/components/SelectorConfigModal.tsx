@@ -23,7 +23,6 @@ interface SelectorConfig {
 interface SelectorConfigModalProps {
     isOpen: boolean;
     onClose: () => void;
-    storeId: string;
 }
 
 const TEMPLATES = [
@@ -39,7 +38,7 @@ const POSITION_OPTIONS = [
     { value: 'last-child', label: 'Último filho' },
 ];
 
-export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen, onClose, storeId }) => {
+export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen, onClose }) => {
     const [activeTab, setActiveTab] = useState<string>('homepage');
     const [configs, setConfigs] = useState<Record<string, SelectorConfig>>({});
     const [isLoading, setIsLoading] = useState(false);
@@ -48,10 +47,10 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
     const [success, setSuccess] = useState<string | null>(null);
 
     useEffect(() => {
-        if (isOpen && storeId) {
+        if (isOpen) {
             loadConfigs();
         }
-    }, [isOpen, storeId]);
+    }, [isOpen]);
 
     const loadConfigs = async () => {
         setIsLoading(true);
@@ -60,8 +59,8 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
             const results: Record<string, SelectorConfig> = {};
             for (const template of TEMPLATES) {
                 try {
-                    const response = await faqAPI.getSelectorConfig(storeId, template.id);
-                    results[template.id] = response.data || { selector: '', position: 'last-child' };
+                    const response = await faqAPI.getSelectorConfig(template.id);
+                    results[template.id] = response.data.data || { selector: '', position: 'last-child' };
                 } catch (err) {
                     results[template.id] = { selector: '', position: 'last-child' };
                 }
@@ -81,7 +80,7 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
         setSuccess(null);
         try {
             const config = configs[activeTab];
-            await faqAPI.updateSelectorConfig(storeId, activeTab, config);
+            await faqAPI.updateSelectorConfig(activeTab, config);
             setSuccess('Configuração salva com sucesso!');
             setTimeout(() => setSuccess(null), 3000);
         } catch (err) {

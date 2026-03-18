@@ -20,8 +20,6 @@ const AdminPage: React.FC = () => {
     const [editorMode, setEditorMode] = useState<EditorMode>({ type: 'closed' });
     const [expandedFaqId, setExpandedFaqId] = useState<number | null>(null);
     const [isSelectorModalOpen, setIsSelectorModalOpen] = useState(false);
-    // Store ID será preenchido pelo middleware na API (request.attributes.store_id)
-    const storeId = '';
 
     useEffect(() => { navigateHeaderRemove(nexo); }, []);
 
@@ -221,7 +219,6 @@ const AdminPage: React.FC = () => {
                         <SelectorConfigModal
                             isOpen={isSelectorModalOpen}
                             onClose={() => setIsSelectorModalOpen(false)}
-                            storeId={storeId}
                         />
                     </Layout.Section>
                 </Layout>

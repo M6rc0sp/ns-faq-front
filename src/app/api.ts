@@ -47,12 +47,12 @@ export const faqAPI = {
     removeCategory: (faqId: string | number, categoryId: string) =>
         axios.delete(`/faqs/${faqId}/categories/${categoryId}`),
 
-    // Selector configuration
-    getSelectorConfig: (storeId: string, template: string) =>
-        axios.get(`/public/faqs/config/${storeId}/${template}`, { baseURL: '' }),
+    // Selector configuration (protected endpoints - storeId from JWT)
+    getSelectorConfig: (template: string) =>
+        axios.get(`/faqs/selector-config/${template}`),
 
-    updateSelectorConfig: (storeId: string, template: string, config: { selector: string; position: string }) =>
-        axios.put(`/public/faqs/config/${storeId}/${template}`, config),
+    updateSelectorConfig: (template: string, config: { selector: string; position: string }) =>
+        axios.put(`/faqs/selector-config/${template}`, config),
 
     // Check existing bindings (public endpoints)
     checkProductFaq: (storeId: string, productId: string) =>
