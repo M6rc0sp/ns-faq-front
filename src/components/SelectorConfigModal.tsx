@@ -38,7 +38,7 @@ const POSITION_OPTIONS = [
 const DEFAULT_SELECTORS: Record<string, SelectorConfig> = {
     homepage: { selector: '[data-store="home-newsletter"]', position: 'before' },
     category: { selector: '.category-body', position: 'last-child' },
-    product: { selector: '.product-container', position: 'last-child' },
+    product: { selector: '#single-product', position: 'last-child' },
 };
 
 export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen, onClose }) => {
