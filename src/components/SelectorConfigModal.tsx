@@ -118,7 +118,7 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
     return (
         <Modal open={isOpen} onDismiss={onClose}>
             <Modal.Header title="⚙️ Configurar Seletores CSS" />
-            
+
             <Modal.Body>
                 {isLoading && (
                     <Box display="flex" justifyContent="center" padding="6">
