@@ -5,7 +5,6 @@ import {
     Button,
     Text,
     Title,
-    Input,
     Textarea,
     Select,
     Card,
@@ -13,7 +12,7 @@ import {
     Alert,
     Label,
 } from '@nimbus-ds/components';
-import { CrossIcon } from '@nimbus-ds/icons';
+import { CloseIcon } from '@nimbus-ds/icons';
 import { faqAPI } from '@/app/api';
 
 interface SelectorConfig {
@@ -41,7 +40,6 @@ const POSITION_OPTIONS = [
 ];
 
 export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen, onClose, storeId }) => {
-    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState<string>('homepage');
     const [configs, setConfigs] = useState<Record<string, SelectorConfig>>({});
     const [isLoading, setIsLoading] = useState(false);
@@ -143,7 +141,7 @@ export const SelectorConfigModal: React.FC<SelectorConfigModalProps> = ({ isOpen
                             onClick={onClose}
                             style={{ padding: '0', minWidth: 'auto' }}
                         >
-                            <CrossIcon size="large" />
+                            <CloseIcon size="large" />
                         </Button>
                     </Box>
                 </Card.Header>
